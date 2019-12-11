@@ -6,3 +6,4 @@ node_modules
 *.bak
 gerber
 build
+persist
