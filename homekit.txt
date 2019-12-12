@@ -1,0 +1,19 @@
+sudo apt update
+sudo apt upgrade
+sudo apt install git
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt install -y nodejs
+sudo apt install libavahi-compat-libdnssd-dev
+sudo npm install -g homebridge
+sudo npm install -g homebridge-mqtt
+
+mkdir .homebridge nella home
+creare file config.json
+
+sudo apt install -y mosquitto mosquitto-clients
+sudo systemctl enable mosquitto.service
+
+sudo npm install -g pm2
+pm2 startup
+pm2 start homebridge
+pm2 save
