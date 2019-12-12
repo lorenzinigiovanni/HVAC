@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "DHT.h"
+#include <Adafruit_BME280.h>
 #include <WiFi.h>
 
 extern "C"
@@ -13,7 +13,7 @@ extern "C"
 #define WIFI_SSID "Lorenzini"
 #define WIFI_PASSWORD "2444666668888888"
 
-#define MQTT_HOST IPAddress(5, 196, 95, 208)
+#define MQTT_HOST IPAddress(192, 168, 69, 220)
 #define MQTT_PORT 1883
 
 AsyncMqttClient mqttClient;
@@ -21,9 +21,7 @@ TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
 TimerHandle_t sensorReadTimer;
 
-#define DHTPIN 15
-#define DHTTYPE DHT22
-DHT dht(DHTPIN, DHTTYPE);
+Adafruit_BME280 bme;
 
 void readSensor();
 void connectToWifi();
@@ -37,7 +35,7 @@ void setup()
 {
   Serial.begin(9600);
 
-  dht.begin();
+  bme.begin(&Wire);
 
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
@@ -59,22 +57,17 @@ void loop()
 
 void readSensor()
 {
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
+  float h = bme.readHumidity();
+  float t = bme.readTemperature();
 
-  if (isnan(h) || isnan(t))
-  {
-    Serial.println(F("Failed to read from DHT sensor!"));
-  }
-  else
-  {
-    char result[8];
-    dtostrf(t, 6, 2, result);
-    mqttClient.publish("ciro/munnezz/temperature", 2, true, result);
+  Serial.println(t);
 
-    dtostrf(h, 6, 2, result);
-    mqttClient.publish("ciro/munnezz/humidity", 2, true, result);
-  }
+  char result[8];
+  dtostrf(t, 6, 2, result);
+  mqttClient.publish("ciro/munnezz/temperature", 0, true, result);
+
+  dtostrf(h, 6, 2, result);
+  mqttClient.publish("ciro/munnezz/humidity", 0, true, result);
 
   xTimerStart(sensorReadTimer, 0);
 }
@@ -112,6 +105,7 @@ void WiFiEvent(WiFiEvent_t event)
 
 void onMqttConnect(bool sessionPresent)
 {
+  Serial.println("MQTT connected");
   mqttClient.subscribe("ciro/munnezz", 2);
   xTimerStart(sensorReadTimer, 0);
 }
