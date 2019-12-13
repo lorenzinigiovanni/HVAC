@@ -100,6 +100,9 @@ public:
     void sendSilent();
     void showKW();
     void jet();
+    void light();
+
+    void print();
 };
 
 #endif

@@ -129,7 +129,7 @@ void LGAircon::send()
 
 void LGAircon::sendVSwing()
 {
-    uint32_t code = createCode(1, 3, (static_cast<uint8_t>(_hSwing) & B11110000) >> 4, static_cast<uint8_t>(_vSwing) & B00001111);
+    uint32_t code = createCode(1, 3, (static_cast<uint8_t>(_vSwing) & B11110000) >> 4, static_cast<uint8_t>(_vSwing) & B00001111);
 
     sendLG(code);
 }
@@ -194,11 +194,31 @@ void LGAircon::jet()
     sendLG(code);
 }
 
+void LGAircon::light()
+{
+    uint32_t code = createCode(0xC, 0, 0, 0xA);
+
+    sendLG(code);
+}
+
+void LGAircon::print()
+{
+    Serial.print("_on: ");
+    Serial.println(_on);
+    Serial.print("_temperature: ");
+    Serial.println(_temperature);
+    Serial.print("_mode: ");
+    Serial.println(static_cast<uint8_t>(_mode));
+    Serial.print("_fanSpeed: ");
+    Serial.println(static_cast<uint8_t>(_fanSpeed));
+    Serial.println();
+}
+
 void LGAircon::sendLG(uint32_t code)
 {
     Serial.print("Code: ");
     Serial.println(code, HEX);
-    _irsend.sendLG(code, 28);
+    _irsend.sendLG2(code, 28);
 }
 
 uint32_t LGAircon::createCode(uint8_t msbits3, uint8_t msbits4, uint8_t msbits5, uint8_t msbits6)
