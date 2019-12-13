@@ -124,45 +124,28 @@ void LGAircon::send()
         code = createCode(0, static_cast<uint8_t>(_mode), _temperature, static_cast<uint8_t>(_fanSpeed));
     }
 
-    _irsend.sendLG(code, 28);
+    sendLG(code);
 }
 
 void LGAircon::sendVSwing()
 {
-    uint32_t code = createCode(1, 3, static_cast<uint8_t>(_vSwing) & B00001111, static_cast<uint8_t>(_vSwing) & B00001111);
+    uint32_t code = createCode(1, 3, (static_cast<uint8_t>(_hSwing) & B11110000) >> 4, static_cast<uint8_t>(_vSwing) & B00001111);
 
-    _irsend.sendLG(code, 28);
+    sendLG(code);
 }
 
 void LGAircon::sendHSwing()
 {
-    uint32_t code = createCode(1, 3, static_cast<uint8_t>(_hSwing) & B00001111, static_cast<uint8_t>(_hSwing) & B00001111);
+    uint32_t code = createCode(1, 3, (static_cast<uint8_t>(_hSwing) & B11110000) >> 4, static_cast<uint8_t>(_hSwing) & B00001111);
 
-    _irsend.sendLG(code, 28);
+    sendLG(code);
 }
 
 void LGAircon::sendEnergyControl()
 {
-    uint32_t code;
+    uint32_t code = createCode(0xC, 0, (static_cast<uint8_t>(_energyControl) & B11110000) >> 4, static_cast<uint8_t>(_energyControl) & B00001111);
 
-    if (_energyControl == EnergyControl::Off)
-    {
-        code = createCode(0xC, 0, 7, 0xF);
-    }
-    else if (_energyControl == EnergyControl::Minus20)
-    {
-        code = createCode(0xC, 0, 7, 0xD);
-    }
-    else if (_energyControl == EnergyControl::Minus40)
-    {
-        code = createCode(0xC, 0, 7, 0xE);
-    }
-    else if (_energyControl == EnergyControl::Minus60)
-    {
-        code = createCode(0xC, 0, 8, 0);
-    }
-
-    _irsend.sendLG(code, 28);
+    sendLG(code);
 }
 
 void LGAircon::sendAutoClean()
@@ -178,7 +161,7 @@ void LGAircon::sendAutoClean()
         code = createCode(0xC, 0, 0, 0xC);
     }
 
-    _irsend.sendLG(code, 28);
+    sendLG(code);
 }
 
 void LGAircon::sendSilent()
@@ -194,20 +177,27 @@ void LGAircon::sendSilent()
         code = createCode(0xC, 0, 0xA, 7);
     }
 
-    _irsend.sendLG(code, 28);
+    sendLG(code);
 }
 
 void LGAircon::showKW()
 {
     uint32_t code = createCode(0xC, 0, 4, 6);
 
-    _irsend.sendLG(code, 28);
+    sendLG(code);
 }
 
 void LGAircon::jet()
 {
     uint32_t code = createCode(1, 0, 0, 8);
 
+    sendLG(code);
+}
+
+void LGAircon::sendLG(uint32_t code)
+{
+    Serial.print("Code: ");
+    Serial.println(code, HEX);
     _irsend.sendLG(code, 28);
 }
 

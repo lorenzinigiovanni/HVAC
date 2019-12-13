@@ -75,6 +75,7 @@ private:
     boolean _silent;
 
     uint32_t createCode(uint8_t msbits3, uint8_t msbits4, uint8_t msbits5, uint8_t msbits6);
+    void sendLG(uint32_t code);
 
 public:
     LGAircon(uint16_t IRSendPin, bool inverted = false, bool useModulation = true);
