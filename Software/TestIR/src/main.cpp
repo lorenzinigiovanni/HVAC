@@ -117,6 +117,10 @@ void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties 
       ac.setHSwing(HorizontalSwing::Step5);
     else if (strcmp(payload, "swing") == 0)
       ac.setHSwing(HorizontalSwing::Swing);
+    else if (strcmp(payload, "swingleft") == 0)
+      ac.setHSwing(HorizontalSwing::SwingLeft);
+    else if (strcmp(payload, "swingright") == 0)
+      ac.setHSwing(HorizontalSwing::SwingRight);
     ac.sendHSwing();
   }
   else if (strcmp(topic, "ac/autoclean") == 0)
