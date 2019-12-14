@@ -2,6 +2,7 @@
 #include <LGAircon.h>
 #include <WiFi.h>
 #include <AsyncMqttClient.h>
+#include <ArduinoJson.h>
 
 #define WIFI_SSID "Lorenzini"
 #define WIFI_PASSWORD "2444666668888888"
@@ -48,44 +49,36 @@ void onMqttMessage(char *topic, char *payloadO, AsyncMqttClientMessageProperties
   Serial.print(" Payload: ");
   Serial.println(payload);
 
-  if (strcmp(topic, "ac/power") == 0)
+  if (strcmp(topic, "ac/set") == 0)
   {
-    if (strcmp(payload, "1") == 0)
-      ac.turnOn();
-    else if (strcmp(payload, "0") == 0)
-      ac.turnOff();
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, payload);
+
+    if (error)
+    {
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error.c_str());
+      return;
+    }
+
+    boolean on = doc["on"];
+    const char *mode = doc["mode"];
+    uint8_t temperature = doc["temperature"];
+    const char *fanSpeed = doc["fanSpeed"];
+
+    Serial.print("JSON on: ");
+    Serial.print(on);
+    Serial.print(" mode: ");
+    Serial.print(mode);
+    Serial.print(" temperature: ");
+    Serial.print(temperature);
+    Serial.print(" fanSpeed: ");
+    Serial.println(fanSpeed);
+
+    ac.set(on, mode, temperature, fanSpeed);
   }
-  else if (strcmp(topic, "ac/mode") == 0)
-  {
-    if (strcmp(payload, "cool") == 0)
-      ac.setMode(Mode::Cooling);
-    else if (strcmp(payload, "heat") == 0)
-      ac.setMode(Mode::Heating);
-    else if (strcmp(payload, "dehum") == 0)
-      ac.setMode(Mode::Dehumidification);
-    else if (strcmp(payload, "vent") == 0)
-      ac.setMode(Mode::Ventilation);
-  }
-  else if (strcmp(topic, "ac/temp") == 0)
-  {
-    ac.setTemperature(atoi(payload));
-  }
-  else if (strcmp(topic, "ac/fan") == 0)
-  {
-    if (strcmp(payload, "low") == 0)
-      ac.setFanSpeed(FanSpeed::Low);
-    else if (strcmp(payload, "midlow") == 0)
-      ac.setFanSpeed(FanSpeed::MidLow);
-    else if (strcmp(payload, "mid") == 0)
-      ac.setFanSpeed(FanSpeed::Mid);
-    else if (strcmp(payload, "midhigh") == 0)
-      ac.setFanSpeed(FanSpeed::MidHigh);
-    else if (strcmp(payload, "high") == 0)
-      ac.setFanSpeed(FanSpeed::High);
-    else if (strcmp(payload, "naturalwind") == 0)
-      ac.setFanSpeed(FanSpeed::NaturalWind);
-  }
-  else if (strcmp(topic, "ac/vswing") == 0)
+
+  if (strcmp(topic, "ac/vswing") == 0)
   {
     if (strcmp(payload, "auto") == 0)
       ac.setVSwing(VerticalSwing::Auto);
@@ -103,7 +96,6 @@ void onMqttMessage(char *topic, char *payloadO, AsyncMqttClientMessageProperties
       ac.setVSwing(VerticalSwing::Step6);
     else if (strcmp(payload, "swing") == 0)
       ac.setVSwing(VerticalSwing::Swing);
-    ac.sendVSwing();
   }
   else if (strcmp(topic, "ac/hswing") == 0)
   {
@@ -125,7 +117,6 @@ void onMqttMessage(char *topic, char *payloadO, AsyncMqttClientMessageProperties
       ac.setHSwing(HorizontalSwing::SwingLeft);
     else if (strcmp(payload, "swingright") == 0)
       ac.setHSwing(HorizontalSwing::SwingRight);
-    ac.sendHSwing();
   }
   else if (strcmp(topic, "ac/autoclean") == 0)
   {
@@ -133,7 +124,6 @@ void onMqttMessage(char *topic, char *payloadO, AsyncMqttClientMessageProperties
       ac.setAutoClean(true);
     else if (strcmp(payload, "0") == 0)
       ac.setAutoClean(false);
-    ac.sendAutoClean();
   }
   else if (strcmp(topic, "ac/silent") == 0)
   {
@@ -141,7 +131,6 @@ void onMqttMessage(char *topic, char *payloadO, AsyncMqttClientMessageProperties
       ac.setSilent(true);
     else if (strcmp(payload, "0") == 0)
       ac.setSilent(false);
-    ac.sendSilent();
   }
   else if (strcmp(topic, "ac/energy") == 0)
   {
@@ -153,7 +142,6 @@ void onMqttMessage(char *topic, char *payloadO, AsyncMqttClientMessageProperties
       ac.setEnergyControl(EnergyControl::Minus40);
     else if (strcmp(payload, "60") == 0)
       ac.setEnergyControl(EnergyControl::Minus60);
-    ac.sendEnergyControl();
   }
   else if (strcmp(topic, "ac/showkw") == 0)
   {
@@ -166,10 +154,6 @@ void onMqttMessage(char *topic, char *payloadO, AsyncMqttClientMessageProperties
   else if (strcmp(topic, "ac/light") == 0)
   {
     ac.light();
-  }
-  else if (strcmp(topic, "ac/send") == 0)
-  {
-    ac.send();
   }
 
   ac.print();

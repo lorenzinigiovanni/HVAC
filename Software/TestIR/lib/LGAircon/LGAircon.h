@@ -74,6 +74,9 @@ private:
     boolean _autoClean;
     boolean _silent;
 
+    void setMode(const char *mode);
+    void setTemperature(uint8_t temperature);
+    void setFanSpeed(const char *fanSpeed);
     uint32_t createCode(uint8_t msbits3, uint8_t msbits4, uint8_t msbits5, uint8_t msbits6);
     void sendLG(uint32_t code);
 
@@ -82,22 +85,12 @@ public:
     ~LGAircon();
 
     void begin();
-    void turnOn();
-    void turnOff();
-    void setMode(Mode mode);
-    void setTemperature(uint8_t temperature);
-    void setFanSpeed(FanSpeed fanSpeed);
+    void set(boolean on, const char *mode, uint8_t temperature, const char *fanSpeed);
     void setVSwing(VerticalSwing vSwing);
     void setHSwing(HorizontalSwing hSwing);
     void setEnergyControl(EnergyControl energyControl);
     void setAutoClean(boolean autoClean);
     void setSilent(boolean silent);
-    void send();
-    void sendVSwing();
-    void sendHSwing();
-    void sendEnergyControl();
-    void sendAutoClean();
-    void sendSilent();
     void showKW();
     void jet();
     void light();

@@ -14,8 +14,8 @@ void LGAircon::begin()
 
     _on = false;
 
-    setMode(Mode::Ventilation);
-    setFanSpeed(FanSpeed::Low);
+    _mode = Mode::Ventilation;
+    _fanSpeed = FanSpeed::Low;
 
     setVSwing(VerticalSwing::Auto);
     setHSwing(HorizontalSwing::Auto);
@@ -26,19 +26,37 @@ void LGAircon::begin()
     _silent = false;
 }
 
-void LGAircon::turnOn()
+void LGAircon::set(boolean on, const char *mode, uint8_t temperature, const char *fanSpeed)
 {
-    _on = true;
+    _on = on;
+    setMode(mode);
+    setTemperature(temperature);
+    setFanSpeed(fanSpeed);
+
+    uint32_t code;
+
+    if (_on)
+    {
+        code = createCode(0, static_cast<uint8_t>(_mode), _temperature, static_cast<uint8_t>(_fanSpeed));
+    }
+    else
+    {
+        code = createCode(0xC, 0, 0, 5);
+    }
+
+    sendLG(code);
 }
 
-void LGAircon::turnOff()
+void LGAircon::setMode(const char *mode)
 {
-    _on = false;
-}
-
-void LGAircon::setMode(Mode mode)
-{
-    _mode = mode;
+    if (strcmp(mode, "cool") == 0)
+        _mode = Mode::Cooling;
+    else if (strcmp(mode, "heat") == 0)
+        _mode = Mode::Heating;
+    else if (strcmp(mode, "dehum") == 0)
+        _mode = Mode::Dehumidification;
+    else if (strcmp(mode, "vent") == 0)
+        _mode = Mode::Ventilation;
 
     if (_mode == Mode::Cooling)
     {
@@ -81,75 +99,53 @@ void LGAircon::setTemperature(uint8_t temperature)
     _temperature = temperature - 15;
 }
 
-void LGAircon::setFanSpeed(FanSpeed fanSpeed)
+void LGAircon::setFanSpeed(const char *fanSpeed)
 {
-    _fanSpeed = fanSpeed;
+    if (strcmp(fanSpeed, "low") == 0)
+        _fanSpeed = FanSpeed::Low;
+    else if (strcmp(fanSpeed, "midlow") == 0)
+        _fanSpeed = FanSpeed::MidLow;
+    else if (strcmp(fanSpeed, "mid") == 0)
+        _fanSpeed = FanSpeed::Mid;
+    else if (strcmp(fanSpeed, "midhigh") == 0)
+        _fanSpeed = FanSpeed::MidHigh;
+    else if (strcmp(fanSpeed, "high") == 0)
+        _fanSpeed = FanSpeed::High;
+    else if (strcmp(fanSpeed, "naturalwind") == 0)
+        _fanSpeed = FanSpeed::NaturalWind;
 }
 
 void LGAircon::setVSwing(VerticalSwing vSwing)
 {
     _vSwing = vSwing;
-}
 
-void LGAircon::setHSwing(HorizontalSwing hSwing)
-{
-    _hSwing = hSwing;
-}
-
-void LGAircon::setEnergyControl(EnergyControl energyControl)
-{
-    _energyControl = energyControl;
-}
-
-void LGAircon::setAutoClean(boolean autoClean)
-{
-    _autoClean = autoClean;
-}
-
-void LGAircon::setSilent(boolean silent)
-{
-    _silent = silent;
-}
-
-void LGAircon::send()
-{
-    uint32_t code;
-
-    if (_on == false)
-    {
-        code = createCode(0xC, 0, 0, 5);
-    }
-    else
-    {
-        code = createCode(0, static_cast<uint8_t>(_mode), _temperature, static_cast<uint8_t>(_fanSpeed));
-    }
-
-    sendLG(code);
-}
-
-void LGAircon::sendVSwing()
-{
     uint32_t code = createCode(1, 3, (static_cast<uint8_t>(_vSwing) & B11110000) >> 4, static_cast<uint8_t>(_vSwing) & B00001111);
 
     sendLG(code);
 }
 
-void LGAircon::sendHSwing()
+void LGAircon::setHSwing(HorizontalSwing hSwing)
 {
+    _hSwing = hSwing;
+
     uint32_t code = createCode(1, 3, (static_cast<uint8_t>(_hSwing) & B11110000) >> 4, static_cast<uint8_t>(_hSwing) & B00001111);
 
     sendLG(code);
 }
 
-void LGAircon::sendEnergyControl()
+void LGAircon::setEnergyControl(EnergyControl energyControl)
 {
+    _energyControl = energyControl;
+
     uint32_t code = createCode(0xC, 0, (static_cast<uint8_t>(_energyControl) & B11110000) >> 4, static_cast<uint8_t>(_energyControl) & B00001111);
 
     sendLG(code);
 }
 
-void LGAircon::sendAutoClean()
+void LGAircon::setAutoClean(boolean autoClean)
 {
+    _autoClean = autoClean;
+
     uint32_t code;
 
     if (_autoClean == true)
@@ -164,8 +160,10 @@ void LGAircon::sendAutoClean()
     sendLG(code);
 }
 
-void LGAircon::sendSilent()
+void LGAircon::setSilent(boolean silent)
 {
+    _silent = silent;
+
     uint32_t code;
 
     if (_silent == true)
