@@ -6,39 +6,20 @@ export class Aircon {
     get on(): boolean {
         return this._on;
     }
-    set on(value: boolean) {
-        this._on = value;
-        if (this._on)
-            this._client.publish(this._topic + '/power', '1');
-        else
-            this._client.publish(this._topic + '/power', '0');
-    }
 
     private _mode: Aircon.Mode = Aircon.Mode.Ventilation;
     get mode(): Aircon.Mode {
         return this._mode;
-    }
-    set mode(value: Aircon.Mode) {
-        this._mode = value;
-        this._client.publish(this._topic + '/mode', this._mode);
     }
 
     private _temperature: number = 0;
     get temperature(): number {
         return this._temperature;
     }
-    set temperature(value: number) {
-        this._temperature = value;
-        this._client.publish(this._topic + '/temp', this._temperature.toString());
-    }
 
     private _fanSpeed: Aircon.FanSpeed = Aircon.FanSpeed.Low;
     get fanSpeed(): Aircon.FanSpeed {
         return this._fanSpeed;
-    }
-    set fanSpeed(value: Aircon.FanSpeed) {
-        this._fanSpeed = value;
-        this._client.publish(this._topic + '/fan', this._fanSpeed);
     }
 
     private _vSwing: Aircon.VerticalSwing = Aircon.VerticalSwing.Auto;
@@ -97,7 +78,16 @@ export class Aircon {
 
     constructor(client: mqtt.MqttClient, topic: string) {
         this._client = client;
-        this._topic = topic;
+        this._topic = topic + '/ac';
+    }
+
+    set(on: boolean, mode: Aircon.Mode, temperature: number, fanSpeed: Aircon.FanSpeed) {
+        this._on = on;
+        this._mode = mode;
+        this._temperature = temperature;
+        this._fanSpeed = fanSpeed;
+
+        this._client.publish(this._topic + '/set', JSON.stringify({ on: this._on, mode: this._mode, temperature: this._temperature, fanSpeed: this._fanSpeed }));
     }
 
     showKW() {

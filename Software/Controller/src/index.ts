@@ -19,17 +19,18 @@ atc1.targetTemperature = 21;*/
 let client = mqtt.connect('mqtt://192.168.69.220')
 
 client.on('connect', function () {
-    client.subscribe('sonda/+');
-    client.subscribe('ac/+');
+    client.subscribe('cameraGiovanni/temperature');
+    client.subscribe('cameraGiovanni/humidity');
+    client.subscribe('test');
 });
 
 client.on('message', function (topic: string, message: Buffer) {
     console.log(topic);
     console.log(message.toString());
 
-    if (topic == 'sonda/temperature')
+    if (topic == 'cameraGiovanni/temperature')
         currentTemperature = +message.toString();
-    if (topic == 'sonda/humidity')
+    if (topic == 'cameraGiovanni/humidity')
         currentHumidity = +message.toString();
 
     accessory
@@ -39,6 +40,9 @@ client.on('message', function (topic: string, message: Buffer) {
     accessory
         .getService(Service.HumiditySensor)!
         .setCharacteristic(Characteristic.CurrentRelativeHumidity, currentHumidity);
+
+    if (topic == 'test')
+        aircon.set(true, Aircon.Mode.Heating, 24, Aircon.FanSpeed.Low);
 });
 
 /*let salotto = new Room("salotto");
@@ -85,9 +89,9 @@ accessory
 
 bridge.addBridgedAccessory(accessory);
 
-let aircon = new Aircon(client, 'ac');
+let aircon = new Aircon(client, 'cameraGiovanni');
 
-const ac = new Accessory('AC LG', uuid.generate('AC LG'));
+/*const ac = new Accessory('AC LG', uuid.generate('AC LG'));
 
 let fanService = ac.addService(Service.Fan, 'Blower')
 
@@ -164,4 +168,4 @@ thermostatService.getCharacteristic(Characteristic.TargetTemperature)!
         callback();
     });
 
-bridge.addBridgedAccessory(ac);
+bridge.addBridgedAccessory(ac);*/
