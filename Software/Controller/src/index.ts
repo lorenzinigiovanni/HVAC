@@ -53,16 +53,12 @@ salotto.dt = 0.05;
 salotto.start();*/
 
 const HAP = require('hap-nodejs');
+import { uuid, Bridge, Accessory, AccessoryEventTypes, Service, Characteristic, CharacteristicEventTypes, CharacteristicValue, CharacteristicSetCallback } from 'hap-nodejs';
 
-const { uuid, Bridge, Accessory, AccessoryEventTypes, Service, Characteristic, CharacteristicEventTypes } = HAP;
 
 HAP.init();
 
 const bridge = new Bridge('Node Bridge', uuid.generate('Node Bridge'));
-bridge.on(AccessoryEventTypes.IDENTIFY, (paired: boolean, callback: any) => {
-    console.log('Node Bridge identify');
-    callback();
-});
 
 bridge.publish({
     username: 'CC:22:3D:E3:CE:F6',
@@ -72,10 +68,6 @@ bridge.publish({
 });
 
 const accessory = new Accessory('Ciro Sonda', uuid.generate('Ciro Sonda'));
-accessory.on(AccessoryEventTypes.IDENTIFY, (paired: boolean, callback: any) => {
-    accessory.identify();
-    callback();
-});
 
 accessory
     .addService(Service.TemperatureSensor)
@@ -96,10 +88,6 @@ bridge.addBridgedAccessory(accessory);
 let aircon = new Aircon(client, 'ac');
 
 const ac = new Accessory('AC LG', uuid.generate('AC LG'));
-ac.on(AccessoryEventTypes.IDENTIFY, (paired: boolean, callback: any) => {
-    ac.identify();
-    callback();
-});
 
 let fanService = ac.addService(Service.Fan, 'Blower')
 
@@ -134,7 +122,7 @@ fanService.addCharacteristic(Characteristic.RotationSpeed)
     });
 
 fanService.addCharacteristic(Characteristic.SwingMode)
-    .on(CharacteristicEventTypes.SET, (value: any, callback: any) => {
+    .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         console.log("Setting horizontal swing to %s", value);
 
         if (value)
@@ -149,7 +137,7 @@ var thermostatService = ac.addService(Service.Thermostat, "Thermostat");
 thermostatService.addLinkedService(fanService);
 
 thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState)!
-    .on(CharacteristicEventTypes.SET, (value: any, callback: any) => {
+    .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         console.log("Characteristic TargetHeatingCoolingState changed to %s", value);
 
         if (value == 0)
@@ -167,10 +155,10 @@ thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState)!
     });
 
 thermostatService.getCharacteristic(Characteristic.TargetTemperature)!
-    .on(CharacteristicEventTypes.SET, (value: any, callback: any) => {
+    .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         console.log("Characteristic TargetTemperature changed to %s", value);
 
-        aircon.temperature = value;
+        aircon.temperature = <number>value;
         aircon.send();
 
         callback();
