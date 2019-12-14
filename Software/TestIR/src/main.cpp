@@ -37,8 +37,12 @@ void loop()
 {
 }
 
-void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
+void onMqttMessage(char *topic, char *payloadO, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
 {
+  char payload[len + 1];
+  strncpy(payload, payloadO, len);
+  payload[len] = 0;
+
   Serial.print("Topic: ");
   Serial.print(topic);
   Serial.print(" Payload: ");
