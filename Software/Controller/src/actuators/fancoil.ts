@@ -1,5 +1,3 @@
-import mqtt from 'mqtt';
-
 export class Fancoil {
 
     private _on: boolean = false;
@@ -9,18 +7,15 @@ export class Fancoil {
     set on(value: boolean) {
         this._on = value;
         if (this.on)
-            this._client.publish(this._topic + '/on', '1');
+            global.mqttClient.publish(this._topic + '/on', '1');
         else
-            this._client.publish(this._topic + '/on', '0');
+            global.mqttClient.publish(this._topic + '/on', '0');
     }
 
-    private _client: mqtt.MqttClient;
     private _topic: string;
 
-    constructor(client: mqtt.MqttClient, topic: string) {
-        this._client = client;
+    constructor(topic: string) {
         this._topic = topic + '/fancoil';
     }
 
 }
-

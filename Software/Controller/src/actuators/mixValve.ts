@@ -1,5 +1,3 @@
-import mqtt from 'mqtt';
-
 export class MixValve {
 
     private _temperature: number = 35;
@@ -8,7 +6,7 @@ export class MixValve {
     }
     set temperature(value: number) {
         this._temperature = value;
-        this._client.publish(this._topic + '/temperature', this._temperature.toString());
+        global.mqttClient.publish(this._topic + '/temperature', this._temperature.toString());
     }
 
     private _minTemperature: number = 20;
@@ -27,11 +25,9 @@ export class MixValve {
         this._maxTemperature = value;
     }
 
-    private _client: mqtt.MqttClient;
     private _topic: string;
 
-    constructor(client: mqtt.MqttClient, name: string) {
-        this._client = client;
+    constructor(name: string) {
         this._topic = 'mixvalve/' + name;
     }
 

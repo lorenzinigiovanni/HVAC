@@ -1,5 +1,3 @@
-import mqtt from 'mqtt';
-
 export class Aircon {
 
     private _on: boolean = false;
@@ -28,7 +26,7 @@ export class Aircon {
     }
     set vSwing(value: Aircon.VerticalSwing) {
         this._vSwing = value;
-        this._client.publish(this._topic + '/vswing', this._vSwing);
+        global.mqttClient.publish(this._topic + '/vswing', this._vSwing);
     }
 
     private _hSwing: Aircon.HorizontalSwing = Aircon.HorizontalSwing.Step3;
@@ -37,7 +35,7 @@ export class Aircon {
     }
     set hSwing(value: Aircon.HorizontalSwing) {
         this._hSwing = value;
-        this._client.publish(this._topic + '/hswing', this._hSwing);
+        global.mqttClient.publish(this._topic + '/hswing', this._hSwing);
     }
 
     private _energyControl: Aircon.EnergyControl = Aircon.EnergyControl.Off;
@@ -46,7 +44,7 @@ export class Aircon {
     }
     set energyControl(value: Aircon.EnergyControl) {
         this._energyControl = value;
-        this._client.publish(this._topic + '/energy', this._energyControl);
+        global.mqttClient.publish(this._topic + '/energy', this._energyControl);
     }
 
     private _autoClean: boolean = false;
@@ -56,9 +54,9 @@ export class Aircon {
     set autoClean(value: boolean) {
         this._autoClean = value;
         if (this._autoClean)
-            this._client.publish(this._topic + '/autoclean', '1');
+            global.mqttClient.publish(this._topic + '/autoclean', '1');
         else
-            this._client.publish(this._topic + '/autoclean', '0');
+            global.mqttClient.publish(this._topic + '/autoclean', '0');
     }
 
     private _silent: boolean = false;
@@ -68,16 +66,14 @@ export class Aircon {
     set silent(value: boolean) {
         this._silent = value;
         if (this._silent)
-            this._client.publish(this._topic + '/silent', '1');
+            global.mqttClient.publish(this._topic + '/silent', '1');
         else
-            this._client.publish(this._topic + '/silent', '0');
+            global.mqttClient.publish(this._topic + '/silent', '0');
     }
 
-    private _client: mqtt.MqttClient;
     private _topic: string;
 
-    constructor(client: mqtt.MqttClient, topic: string) {
-        this._client = client;
+    constructor(topic: string) {
         this._topic = topic + '/ac';
     }
 
@@ -87,23 +83,23 @@ export class Aircon {
         this._temperature = temperature;
         this._fanSpeed = fanSpeed;
 
-        this._client.publish(this._topic + '/set', JSON.stringify({ on: this._on, mode: this._mode, temperature: this._temperature, fanSpeed: this._fanSpeed }));
+        global.mqttClient.publish(this._topic + '/set', JSON.stringify({ on: this._on, mode: this._mode, temperature: this._temperature, fanSpeed: this._fanSpeed }));
     }
 
     showKW() {
-        this._client.publish(this._topic + '/showkw', '');
+        global.mqttClient.publish(this._topic + '/showkw', '');
     }
 
     jet() {
-        this._client.publish(this._topic + '/jet', '');
+        global.mqttClient.publish(this._topic + '/jet', '');
     }
 
     light() {
-        this._client.publish(this._topic + '/light', '');
+        global.mqttClient.publish(this._topic + '/light', '');
     }
 
     send() {
-        this._client.publish(this._topic + '/send', '');
+        global.mqttClient.publish(this._topic + '/send', '');
     }
 
 }
