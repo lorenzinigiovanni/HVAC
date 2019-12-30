@@ -15,6 +15,9 @@ export class HomekitTemperatureSensor {
         this._accessory = new Accessory('Temperatura ' + name, uuid.generate('Temperatura ' + name));
         this._service = this._accessory.addService(Service.TemperatureSensor);
 
+        this._service.getCharacteristic(Characteristic.CurrentTemperature)!.props.minValue = -100;
+        this._service.getCharacteristic(Characteristic.CurrentTemperature)!.props.maxValue = 100;
+
         this._service.getCharacteristic(Characteristic.CurrentTemperature)!
             .on(CharacteristicEventTypes.GET, this._onGetCurrentTemperature);
 
