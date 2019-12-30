@@ -1,6 +1,7 @@
 import { PID } from "./PID"
 
 export class AmbientTemperatureController {
+
     private _pid: PID = new PID();
     private _timer?: NodeJS.Timeout;
 
@@ -69,4 +70,5 @@ export class AmbientTemperatureController {
             clearInterval(this._timer);
         }
     }
+
 }
