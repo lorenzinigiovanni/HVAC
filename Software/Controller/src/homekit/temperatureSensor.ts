@@ -12,7 +12,7 @@ export class HomekitTemperatureSensor {
     }
 
     constructor(name: string) {
-        this._accessory = new Accessory('Temperature ' + name, uuid.generate('Temperature ' + name));
+        this._accessory = new Accessory('Temperatura ' + name, uuid.generate('Temperatura ' + name));
         this._service = this._accessory.addService(Service.TemperatureSensor);
 
         this._service.getCharacteristic(Characteristic.CurrentTemperature)!

@@ -12,7 +12,7 @@ export class HomekitHumiditySensor {
     }
 
     constructor(name: string) {
-        this._accessory = new Accessory('Humidity ' + name, uuid.generate('Humidity ' + name));
+        this._accessory = new Accessory('Umidità ' + name, uuid.generate('Umidità ' + name));
         this._service = this._accessory.addService(Service.HumiditySensor);
 
         this._service.getCharacteristic(Characteristic.CurrentRelativeHumidity)!

@@ -22,7 +22,7 @@ export class HomekitThermostat {
     }
 
     constructor(name: string) {
-        this._accessory = new Accessory('Thermostat ' + name, uuid.generate('Thermostat ' + name));
+        this._accessory = new Accessory('Termostato ' + name, uuid.generate('Termostato ' + name));
         this._service = this._accessory.addService(Service.Thermostat);
 
         this._service.getCharacteristic(Characteristic.TargetTemperature)!
