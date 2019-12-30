@@ -12,10 +12,13 @@ export class Pump {
             global.mqttClient.publish(this._topic + '/on', '0');
     }
 
+    private _name: string;
     private _topic: string;
 
     constructor(name: string) {
-        this._topic = 'pump/' + name;
+        this._name = name;
+
+        this._topic = 'pump/' + this._name.toLocaleLowerCase().replace(/\s+/g, '');
     }
 
 }

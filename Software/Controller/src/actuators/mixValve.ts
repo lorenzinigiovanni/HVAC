@@ -25,10 +25,13 @@ export class MixValve {
         this._maxTemperature = value;
     }
 
+    private _name: string;
     private _topic: string;
 
     constructor(name: string) {
-        this._topic = 'mixvalve/' + name;
+        this._name = name;
+
+        this._topic = 'mixvalve/' + this._name.toLocaleLowerCase().replace(/\s+/g, '');
     }
 
 }

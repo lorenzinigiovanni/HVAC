@@ -15,7 +15,7 @@ export class Outdoors {
     constructor(name: string) {
         this._name = name;
 
-        this._topic = 'outdoors/' + this._name;
+        this._topic = 'outdoors/' + this._name.toLocaleLowerCase().replace(/\s+/g, '');
 
         this._ambientSensor = new AmbientSensor(this._topic);
 

@@ -27,7 +27,7 @@ export class Room {
     constructor(name: string, hasRadiant: boolean, hasAircon: boolean, hasPelletStove: boolean, hasFancoil: boolean) {
         this._name = name;
 
-        this._topic = 'room/' + this._name;
+        this._topic = 'room/' + this._name.toLocaleLowerCase().replace(/\s+/g, '');
 
         if (hasRadiant) {
             this._radiant = new Radiant(this._topic);
