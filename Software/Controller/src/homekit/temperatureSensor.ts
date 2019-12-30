@@ -5,6 +5,12 @@ export class HomekitTemperatureSensor {
     private _accessory: Accessory;
     private _service: Service;
 
+    private _temperature: number = 0;
+    set temperature(value: number) {
+        this._temperature = value;
+        this._service.getCharacteristic(Characteristic.CurrentTemperature)?.updateValue(this._temperature);
+    }
+
     constructor(name: string) {
         this._accessory = new Accessory('Temperature ' + name, uuid.generate('Temperature ' + name));
         this._service = this._accessory.addService(Service.TemperatureSensor);
@@ -16,7 +22,7 @@ export class HomekitTemperatureSensor {
     }
 
     onGetCurrentTemperature(callback: CharacteristicSetCallback) {
-        callback(null, 20);
+        callback(null, this._temperature);
     }
 
 }
