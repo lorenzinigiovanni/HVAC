@@ -10,7 +10,7 @@ export class System {
     private _office: Room;
     private _wc: Room;
 
-    private _outdoors: Outdoors;
+    private _outdoors: Outdoors[] = [];
 
     private _pumps: Pump[] = [];
     private _mixValves: MixValve[] = [];
@@ -31,7 +31,9 @@ export class System {
         this._office = new Room('Ufficio Falegnameria', false, false, false, true);
         this._wc = new Room('Bagno Falegnameria', false, false, false, true);
 
-        this._outdoors = new Outdoors('Esterno');
+        this._outdoors.push(new Outdoors('Esterno'));
+        this._outdoors.push(new Outdoors('Magazzino'));
+        this._outdoors.push(new Outdoors('Caldaia'));
 
         this._pumps.push(new Pump('Casa'));
         this._pumps.push(new Pump('Falegnameria'));
