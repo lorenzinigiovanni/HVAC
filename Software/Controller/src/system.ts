@@ -1,6 +1,7 @@
 import { Room } from "./places/room";
 import { Pump } from './actuators/pump';
 import { MixValve } from './actuators/mixValve';
+import { Outdoors } from "./places/outdoors";
 
 export class System {
 
@@ -8,6 +9,8 @@ export class System {
     private _workshop: Room;
     private _office: Room;
     private _wc: Room;
+
+    private _outdoors: Outdoors;
 
     private _pumps: Pump[] = [];
     private _mixValves: MixValve[] = [];
@@ -27,6 +30,8 @@ export class System {
         this._workshop = new Room('Falegnameria', true, false, false, false);
         this._office = new Room('UfficioFalegnameria', false, false, false, true);
         this._wc = new Room('BagnoFalegnameria', false, false, false, true);
+
+        this._outdoors = new Outdoors('Fuori');
 
         this._pumps.push(new Pump('Casa'));
         this._pumps.push(new Pump('Falegnameria'));
