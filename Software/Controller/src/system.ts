@@ -9,8 +9,10 @@ export class System {
     private _workshop: Room;
     private _office: Room;
     private _wc: Room;
+    private _warehouse: Room;
+    private _boilerroom: Room;
 
-    private _outdoors: Outdoors[] = [];
+    private _outdoors: Outdoors;
 
     private _pumps: Pump[] = [];
     private _mixValves: MixValve[] = [];
@@ -30,10 +32,10 @@ export class System {
         this._workshop = new Room('Falegnameria', true, false, false, false);
         this._office = new Room('Ufficio Falegnameria', false, false, false, true);
         this._wc = new Room('Bagno Falegnameria', false, false, false, true);
+        this._warehouse = new Room('Magazzino', false, false, false, false);
+        this._boilerroom = new Room('Locale Caldaia', false, false, false, false);
 
-        this._outdoors.push(new Outdoors('Esterno'));
-        this._outdoors.push(new Outdoors('Magazzino'));
-        this._outdoors.push(new Outdoors('Caldaia'));
+        this._outdoors = new Outdoors('Esterno');
 
         this._pumps.push(new Pump('Casa'));
         this._pumps.push(new Pump('Falegnameria'));
