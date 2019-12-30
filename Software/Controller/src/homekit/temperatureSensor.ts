@@ -16,12 +16,12 @@ export class HomekitTemperatureSensor {
         this._service = this._accessory.addService(Service.TemperatureSensor);
 
         this._service.getCharacteristic(Characteristic.CurrentTemperature)!
-            .on(CharacteristicEventTypes.GET, this.onGetCurrentTemperature);
+            .on(CharacteristicEventTypes.GET, this._onGetCurrentTemperature);
 
         global.homekitBridge.addBridgedAccessory(this._accessory);
     }
 
-    onGetCurrentTemperature(callback: CharacteristicSetCallback) {
+    private _onGetCurrentTemperature(callback: CharacteristicSetCallback) {
         callback(null, this._temperature);
     }
 
