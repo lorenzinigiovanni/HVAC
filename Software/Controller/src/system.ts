@@ -1,4 +1,4 @@
-import { Room } from "./room";
+import { Room } from "./places/room";
 import { Pump } from './actuators/pump';
 import { MixValve } from './actuators/mixValve';
 

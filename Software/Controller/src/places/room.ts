@@ -1,15 +1,15 @@
-import { Radiant } from "./actuators/radiant";
-import { Aircon } from "./actuators/aircon";
-import { PelletStove } from "./actuators/pelletStove";
-import { AmbientSensor } from './sensors/ambientSensor';
-import { Fancoil } from './actuators/fancoil';
-import { AmbientTemperatureController } from './controllers/ambientTemperatureController';
-import { HomekitThermostat } from "./homekit/thermostat";
-import { HomekitHumiditySensor } from "./homekit/humiditySensor";
+import { Radiant } from "../actuators/radiant";
+import { Aircon } from "../actuators/aircon";
+import { PelletStove } from "../actuators/pelletStove";
+import { AmbientSensor } from '../sensors/ambientSensor';
+import { Fancoil } from '../actuators/fancoil';
+import { AmbientTemperatureController } from '../controllers/ambientTemperatureController';
+import { HomekitThermostat } from "../homekit/thermostat";
+import { HomekitHumiditySensor } from "../homekit/humiditySensor";
 
 export class Room {
-    private _name: string;
 
+    private _name: string;
     private _topic: string;
 
     private _radiant?: Radiant;
@@ -17,7 +17,7 @@ export class Room {
     private _pelletStove?: PelletStove;
     private _fancoil?: Fancoil;
 
-    private _roomSensor: AmbientSensor;
+    private _ambientSensor: AmbientSensor;
 
     private _ambientTemperatureController: AmbientTemperatureController;
 
@@ -42,7 +42,7 @@ export class Room {
             this._fancoil = new Fancoil(this._topic);
         }
 
-        this._roomSensor = new AmbientSensor(this._topic);
+        this._ambientSensor = new AmbientSensor(this._topic);
 
         this._ambientTemperatureController = new AmbientTemperatureController();
         this._ambientTemperatureController.powerChanged = this._powerChanged;
