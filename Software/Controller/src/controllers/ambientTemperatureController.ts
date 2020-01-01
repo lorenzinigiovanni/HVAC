@@ -1,13 +1,13 @@
+import { EventEmitter } from "events";
 import { PID } from "./PID"
 
-export class AmbientTemperatureController {
+export class AmbientTemperatureController extends EventEmitter {
 
     private _pid: PID = new PID();
     private _timer?: NodeJS.Timeout;
 
     dt: number = 1;
     mode: boolean = false;
-    powerChanged?: (val: number) => void;
 
     get targetTemperature(): number {
         return this._pid.target;
@@ -56,9 +56,7 @@ export class AmbientTemperatureController {
         }
 
         this._power = val;
-        if (this.powerChanged) {
-            this.powerChanged(this._power);
-        }
+        this.emit('powerChanged', this._power);
     }
 
     start() {
@@ -71,4 +69,8 @@ export class AmbientTemperatureController {
         }
     }
 
+}
+
+export interface AmbientTemperatureController {
+    on(event: 'powerChanged', listener: (power: number) => void): this;
 }

@@ -54,7 +54,7 @@ export class Room {
 
         if (this._hasHeating) {
             this._ambientTemperatureController = new AmbientTemperatureController();
-            this._ambientTemperatureController.powerChanged = this._powerChanged;
+            this._ambientTemperatureController.on('powerChanged', this._powerChanged);
         }
 
         if (this._hasHeating) {
@@ -66,7 +66,7 @@ export class Room {
         this._homekitHumiditySensor = new HomekitHumiditySensor(this._name);
     }
 
-    private _powerChanged(val: number) {
+    private _powerChanged = (val: number) => {
 
     }
 
