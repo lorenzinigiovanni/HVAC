@@ -18,8 +18,8 @@ extern "C"
 #define MQTT_HOST IPAddress(192, 168, 69, 220)
 #define MQTT_PORT 1883
 
-#define baseTopic "cameraGiovanni"
-#define AC
+#define baseTopic "magazzino"
+// #define AC
 
 AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
@@ -46,7 +46,9 @@ void setup()
 
   bme.begin(&Wire);
 
+#ifdef AC
   ac.begin();
+#endif
 
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
@@ -74,11 +76,11 @@ void readSensor()
   char result[8];
   char topic[50];
 
-  snprintf(topic, 50, "%s/temperature", baseTopic);
+  snprintf(topic, 50, "room/%s/ambientsensor/temperature", baseTopic);
   dtostrf(t, 6, 2, result);
   mqttClient.publish(topic, 0, true, result);
 
-  snprintf(topic, 50, "%s/humidity", baseTopic);
+  snprintf(topic, 50, "room/%s/ambientsensor/humidity", baseTopic);
   dtostrf(h, 6, 2, result);
   mqttClient.publish(topic, 0, true, result);
 
