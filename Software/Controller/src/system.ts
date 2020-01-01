@@ -2,6 +2,7 @@ import { Room } from "./places/room";
 import { Pump } from './actuators/pump';
 import { MixValve } from './actuators/mixValve';
 import { Outdoors } from "./places/outdoors";
+import { Climatic } from "./controllers/climatic";
 
 export class System {
 
@@ -16,6 +17,7 @@ export class System {
 
     private _pumps: Pump[] = [];
     private _mixValves: MixValve[] = [];
+    private _climatics: Climatic[] = [];
 
     constructor() {
         this._home.push(new Room('Cucina', true, true, false, false));
@@ -44,6 +46,10 @@ export class System {
 
         this._mixValves.push(new MixValve('Casa'));
         this._mixValves.push(new MixValve('Falegnameria'));
+
+        this._climatics.push(new Climatic());
+        this._climatics.push(new Climatic());
+
     }
 
 }
