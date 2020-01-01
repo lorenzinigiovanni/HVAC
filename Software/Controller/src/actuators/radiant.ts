@@ -15,23 +15,22 @@ export class Radiant {
         return this._power;
     }
     set power(value: number) {
-        if (value != this._power) {
-            this._power = value;
-            if (this._power > this._minPower) {
-                this._turnOn();
-            }
-            else {
-                this._turnOff();
-            }
+        if (value > 0.9) {
+            this._power = 1;
         }
-    }
+        else if (value < 0.1) {
+            this._power = 0;
+        }
+        else {
+            this._power = value;
+        }
 
-    private _minPower: number = 0.1;
-    get minPower(): number {
-        return this._minPower;
-    }
-    set minPower(value: number) {
-        this._minPower = value;
+        if (this._power > 0 && !this._on) {
+            this._turnOn();
+        }
+        else if (this._power == 0 && this._on) {
+            this._turnOff();
+        }
     }
 
     constructor(topic: string) {
@@ -52,7 +51,7 @@ export class Radiant {
         this._on = false;
         global.mqttClient.publish(this._topic + '/on', '0');
 
-        if (this._power > this._minPower) {
+        if (this._power > 0) {
             this._timer = setInterval(() => this._turnOn(), (1 - this._power) * this.dt * 60 * 1000);
         }
     }
