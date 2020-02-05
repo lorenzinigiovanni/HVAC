@@ -1,6 +1,7 @@
 import { uuid, Accessory, Service, Characteristic, CharacteristicEventTypes, CharacteristicValue, CharacteristicSetCallback } from 'hap-nodejs';
+import { EventEmitter } from 'events';
 
-export class HomekitThermostat {
+export class HomekitThermostat extends EventEmitter {
 
     private _accessory: Accessory;
     private _service: Service;
@@ -22,8 +23,12 @@ export class HomekitThermostat {
     }
 
     constructor(name: string) {
+        super();
+
         this._accessory = new Accessory('Termostato ' + name, uuid.generate('Termostato ' + name));
         this._service = this._accessory.addService(Service.Thermostat);
+
+        this._service.getCharacteristic(Characteristic.TargetHeatingCoolingState)!.props.validValues = [0, 3];
 
         this._service.getCharacteristic(Characteristic.TargetTemperature)!
             .on(CharacteristicEventTypes.SET, this._onNewTargetTemperature);
@@ -39,13 +44,13 @@ export class HomekitThermostat {
 
     private _onNewTargetTemperature(value: CharacteristicValue, callback: CharacteristicSetCallback) {
         this._targetTemperature = <number>value;
-        console.log("Characteristic TargetTemperature changed to %s", value);
+        this.emit('newTargetTemperature', this._targetTemperature);
         callback();
     }
 
     private _onNewTargetHeatingCoolingState(value: CharacteristicValue, callback: CharacteristicSetCallback) {
         this._targetHeatingCoolingState = <number>value;
-        console.log("Characteristic TargetHeatingCoolingState changed to %s", value);
+        this.emit('newTargetHeatingCoolingState', this._targetHeatingCoolingState);
         callback();
     }
 
@@ -53,4 +58,9 @@ export class HomekitThermostat {
         callback(null, this._currentTemperature);
     }
 
+}
+
+export interface HomekitThermostat {
+    on(event: 'newTargetTemperature', listener: (targetTemperature: number) => void): this;
+    on(event: 'newTargetHeatingCoolingState', listener: (heatingCoolingState: number) => void): this;
 }
