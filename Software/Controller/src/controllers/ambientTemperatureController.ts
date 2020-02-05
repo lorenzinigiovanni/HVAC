@@ -7,7 +7,7 @@ export class AmbientTemperatureController extends EventEmitter {
     private _timer?: NodeJS.Timeout;
 
     dt: number = 1;
-    mode: boolean = false;
+    mode: boolean = false; // false = heating, true = cooling
 
     get targetTemperature(): number {
         return this._pid.target;
@@ -60,6 +60,7 @@ export class AmbientTemperatureController extends EventEmitter {
     }
 
     start() {
+        this._update();
         this._timer = setInterval(() => this._update(), this.dt * 60 * 1000);
     }
 
@@ -67,6 +68,8 @@ export class AmbientTemperatureController extends EventEmitter {
         if (this._timer) {
             clearInterval(this._timer);
         }
+        this._power = 0;
+        this.emit('powerChanged', this._power);
     }
 
 }
