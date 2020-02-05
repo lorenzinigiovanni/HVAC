@@ -3,6 +3,7 @@
 #include <WiFi.h>
 #include <ArduinoJson.h>
 #include <LGAircon.h>
+#include "esp32-hal-cpu.h"
 
 extern "C"
 {
@@ -11,6 +12,9 @@ extern "C"
 }
 
 #include <AsyncMqttClient.h>
+
+#define uS_TO_S_FACTOR 1000000
+#define TIME_TO_SLEEP 10
 
 #define WIFI_SSID "Lorenzini"
 #define WIFI_PASSWORD "2444666668888888"
@@ -42,6 +46,8 @@ void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties 
 
 void setup()
 {
+  setCpuFrequencyMhz(80);
+
   Serial.begin(9600);
 
   bme.begin(&Wire);
@@ -50,9 +56,9 @@ void setup()
   ac.begin();
 #endif
 
-  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
+  /*mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
-  sensorReadTimer = xTimerCreate("sensorTimer", pdMS_TO_TICKS(3000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(readSensor));
+  sensorReadTimer = xTimerCreate("sensorTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(readSensor));*/
 
   WiFi.onEvent(WiFiEvent);
 
@@ -66,6 +72,12 @@ void setup()
 
 void loop()
 {
+}
+
+void sleep()
+{
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  esp_deep_sleep_start();
 }
 
 void readSensor()
@@ -84,7 +96,9 @@ void readSensor()
   dtostrf(h, 6, 2, result);
   mqttClient.publish(topic, 0, true, result);
 
-  xTimerStart(sensorReadTimer, 0);
+  // xTimerStart(sensorReadTimer, 0);
+
+  sleep();
 }
 
 void connectToWifi()
@@ -112,8 +126,8 @@ void WiFiEvent(WiFiEvent_t event)
     break;
   case SYSTEM_EVENT_STA_DISCONNECTED:
     Serial.println("WiFi lost connection");
-    xTimerStop(mqttReconnectTimer, 0);
-    xTimerStart(wifiReconnectTimer, 0);
+    //xTimerStop(mqttReconnectTimer, 0);
+    //xTimerStart(wifiReconnectTimer, 0);
     break;
   }
 }
@@ -121,7 +135,8 @@ void WiFiEvent(WiFiEvent_t event)
 void onMqttConnect(bool sessionPresent)
 {
   Serial.println("MQTT connected");
-  xTimerStart(sensorReadTimer, 0);
+  readSensor();
+  //xTimerStart(sensorReadTimer, 0);
 #ifdef AC
   char topic[50];
   snprintf(topic, 50, "%s/ac/+", baseTopic);
@@ -163,24 +178,17 @@ void onMqttMessage(char *topic, char *payloadO, AsyncMqttClientMessageProperties
       return;
     }
 
-    boolean on = doc["on"];
     const char *mode = doc["mode"];
     uint8_t temperature = doc["temperature"];
     const char *fanSpeed = doc["fanSpeed"];
 
-    Serial.print("JSON on: ");
-    Serial.print(on);
-    Serial.print(" mode: ");
-    Serial.print(mode);
-    Serial.print(" temperature: ");
-    Serial.print(temperature);
-    Serial.print(" fanSpeed: ");
-    Serial.println(fanSpeed);
-
-    ac.set(on, mode, temperature, fanSpeed);
+    ac.set(mode, temperature, fanSpeed);
   }
-
-  if (strstr(topic, "ac/vswing") != NULL)
+  else if (strstr(topic, "ac/off") != NULL)
+  {
+    ac.turnOff();
+  }
+  else if (strstr(topic, "ac/vswing") != NULL)
   {
     if (strstr(payload, "auto") != NULL)
       ac.setVSwing(VerticalSwing::Auto);

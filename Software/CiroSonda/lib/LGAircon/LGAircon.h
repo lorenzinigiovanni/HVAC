@@ -85,7 +85,8 @@ public:
     ~LGAircon();
 
     void begin();
-    void set(boolean on, const char *mode, uint8_t temperature, const char *fanSpeed);
+    void set(const char *mode, uint8_t temperature, const char *fanSpeed);
+    void turnOff();
     void setVSwing(VerticalSwing vSwing);
     void setHSwing(HorizontalSwing hSwing);
     void setEnergyControl(EnergyControl energyControl);

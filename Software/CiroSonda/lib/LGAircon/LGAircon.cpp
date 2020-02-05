@@ -26,23 +26,24 @@ void LGAircon::begin()
     _silent = false;
 }
 
-void LGAircon::set(boolean on, const char *mode, uint8_t temperature, const char *fanSpeed)
+void LGAircon::set(const char *mode, uint8_t temperature, const char *fanSpeed)
 {
-    _on = on;
+    _on = true;
+
     setMode(mode);
     setTemperature(temperature);
     setFanSpeed(fanSpeed);
 
-    uint32_t code;
+    uint32_t code = createCode(0, static_cast<uint8_t>(_mode), _temperature, static_cast<uint8_t>(_fanSpeed));
 
-    if (_on)
-    {
-        code = createCode(0, static_cast<uint8_t>(_mode), _temperature, static_cast<uint8_t>(_fanSpeed));
-    }
-    else
-    {
-        code = createCode(0xC, 0, 0, 5);
-    }
+    sendLG(code);
+}
+
+void LGAircon::turnOff()
+{
+    _on = false;
+
+    uint32_t code = createCode(0xC, 0, 0, 5);
 
     sendLG(code);
 }

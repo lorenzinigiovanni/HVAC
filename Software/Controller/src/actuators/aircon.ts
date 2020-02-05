@@ -77,13 +77,18 @@ export class Aircon {
         this._topic = topic + '/ac';
     }
 
-    set(on: boolean, mode: Aircon.Mode, temperature: number, fanSpeed: Aircon.FanSpeed) {
-        this._on = on;
+    set(mode: Aircon.Mode, temperature: number, fanSpeed: Aircon.FanSpeed) {
+        this._on = true;
         this._mode = mode;
         this._temperature = temperature;
         this._fanSpeed = fanSpeed;
 
-        global.mqttClient.publish(this._topic + '/set', JSON.stringify({ on: this._on, mode: this._mode, temperature: this._temperature, fanSpeed: this._fanSpeed }));
+        global.mqttClient.publish(this._topic + '/set', JSON.stringify({ mode: this._mode, temperature: this._temperature, fanSpeed: this._fanSpeed }));
+    }
+
+    turnOff() {
+        this._on = false;
+        global.mqttClient.publish(this._topic + '/off', '');
     }
 
     showKW() {
