@@ -22,8 +22,8 @@ extern "C"
 #define MQTT_HOST IPAddress(192, 168, 69, 220)
 #define MQTT_PORT 1883
 
-#define baseTopic "magazzino"
-// #define AC
+#define baseTopic "cameragiovanni"
+#define AC
 
 AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
@@ -33,7 +33,7 @@ TimerHandle_t sensorReadTimer;
 Adafruit_BME280 bme;
 
 #ifdef AC
-LGAircon ac(25, true);
+LGAircon ac(25, false);
 #endif
 
 void readSensor();
@@ -56,9 +56,9 @@ void setup()
   ac.begin();
 #endif
 
-  /*mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
+  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
-  sensorReadTimer = xTimerCreate("sensorTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(readSensor));*/
+  sensorReadTimer = xTimerCreate("sensorTimer", pdMS_TO_TICKS(60000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(readSensor));
 
   WiFi.onEvent(WiFiEvent);
 
@@ -72,13 +72,14 @@ void setup()
 
 void loop()
 {
+  delay(1000);
 }
 
-void sleep()
+/*void sleep()
 {
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   esp_deep_sleep_start();
-}
+}*/
 
 void readSensor()
 {
@@ -96,9 +97,9 @@ void readSensor()
   dtostrf(h, 6, 2, result);
   mqttClient.publish(topic, 0, true, result);
 
-  // xTimerStart(sensorReadTimer, 0);
+  xTimerStart(sensorReadTimer, 0);
 
-  sleep();
+  // sleep();
 }
 
 void connectToWifi()
@@ -126,8 +127,8 @@ void WiFiEvent(WiFiEvent_t event)
     break;
   case SYSTEM_EVENT_STA_DISCONNECTED:
     Serial.println("WiFi lost connection");
-    //xTimerStop(mqttReconnectTimer, 0);
-    //xTimerStart(wifiReconnectTimer, 0);
+    xTimerStop(mqttReconnectTimer, 0);
+    xTimerStart(wifiReconnectTimer, 0);
     break;
   }
 }
@@ -135,11 +136,11 @@ void WiFiEvent(WiFiEvent_t event)
 void onMqttConnect(bool sessionPresent)
 {
   Serial.println("MQTT connected");
-  readSensor();
-  //xTimerStart(sensorReadTimer, 0);
+  //readSensor();
+  xTimerStart(sensorReadTimer, 0);
 #ifdef AC
   char topic[50];
-  snprintf(topic, 50, "%s/ac/+", baseTopic);
+  snprintf(topic, 50, "room/%s/ac/+", baseTopic);
   mqttClient.subscribe(topic, 0);
 #endif
 }
